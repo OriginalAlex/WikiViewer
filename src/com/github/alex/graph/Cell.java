@@ -33,27 +33,26 @@ public class Cell extends Pane {
         setOnMouseClicked(event -> {
             switch (event.getButton()) {
                 case PRIMARY:
-                    if (hasBeenExpandedBefore) {
-                        return;
-                    }
-                    Amalgamater amalgamater = new Amalgamater(articleName);
-                    List<ArticleInformation> children = amalgamater.createTree();
-                    Model model = Graph.getInstance().getModel();
-                    for (ArticleInformation n : children) {
-                        if (!model.cellMap.containsKey(n.getArticleName())) {
-                            model.addCell(n.getArticleName(), CellType.CIRCLE, n.getArticleLink());
-                            model.addEdge(articleName, n.getArticleName());
+                    if (!hasBeenExpandedBefore) {
+                        Amalgamater amalgamater = new Amalgamater(articleName);
+                        List<ArticleInformation> children = amalgamater.createTree();
+                        Model model = Graph.getInstance().getModel();
+                        for (ArticleInformation n : children) {
+                            if (!model.cellMap.containsKey(n.getArticleName())) {
+                                model.addCell(n.getArticleName(), CellType.CIRCLE, n.getArticleLink());
+                                model.addEdge(articleName, n.getArticleName());
 
-                        } else {
-                            Cell parent = model.cellMap.get(n.getArticleName());
-                            Color twoShadesDarker = ((Color) (((Circle) parent.getView()).getFill())).darker().darker();
-                            ((Circle) parent.getView()).setFill(twoShadesDarker); // Set the node color two shades darker every time another node references it (aesthetic reasons)
-                            ((Circle) parent.getView()).setRadius(((Circle) parent.getView()).getRadius()+2); // Increase the radius by two in addition to the aforementioned.
-                            model.addEdge(articleName, parent.getArticleName());
+                            } else {
+                                Cell parent = model.cellMap.get(n.getArticleName());
+                                Color twoShadesDarker = ((Color) (((Circle) parent.getView()).getFill())).darker().darker();
+                                ((Circle) parent.getView()).setFill(twoShadesDarker); // Set the node color two shades darker every time another node references it (aesthetic reasons)
+                                ((Circle) parent.getView()).setRadius(((Circle) parent.getView()).getRadius() + 2); // Increase the radius by two in addition to the aforementioned.
+                                model.addEdge(articleName, parent.getArticleName());
+                            }
                         }
+                        Graph.getInstance().endUpdate();
+                        hasBeenExpandedBefore = true;
                     }
-                    Graph.getInstance().endUpdate();
-                    hasBeenExpandedBefore = true;
                     break;
                 case SECONDARY:
                     try {
